@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block title %}CP Tracker · Report Preview{% endblock %}
+
+{% block content %}
+  <section class="panel">
+    <h1 class="panel-title">Report Preview</h1>
+    <p class="panel-subtitle">
+      A PDF report will be generated for <strong>{{ student.name }}</strong> with their
+      latest contest performance from Codeforces, CodeChef, and LeetCode.
+    </p>
+
+    <div class="report-preview-box">
+      <p class="mono">
+        [{{ student.name }}]<br />
+        Generated on: {{ today }}
+      </p>
+      <p class="mono">
+        SUMMARY: Total Contests: {{ summary.total_contests }}
+        &nbsp; | &nbsp;
+        Problems Solved: {{ summary.total_problems }}
+        &nbsp; | &nbsp;
+        Peak Rating: {{ summary.peak_rating }}
+      </p>
+      <p class="mono dim">
+        Sections: CODEFORCES, CODECHEF, LEETCODE
+      </p>
+    </div>
+
+    <div class="report-actions">
+      <a href="{{ url_for('download_report', student_id=student.id) }}" class="btn btn-primary">
+        Download PDF Report
+      </a>
+      <a href="{{ url_for('student_dashboard', student_id=student.id) }}" class="btn btn-ghost">
+        Back to dashboard
+      </a>
+    </div>
+  </section>
+{% endblock %}
+

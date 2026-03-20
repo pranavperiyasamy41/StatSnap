@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block title %}StatSnap · Students{% endblock %}
+
+{% block content %}
+  <section class="panel">
+    <h1 class="panel-title">Students</h1>
+    <p class="panel-subtitle">
+      View and sync Codeforces, CodeChef, and LeetCode contest history for all students.
+    </p>
+
+    {% if students %}
+      <div class="cards-grid">
+        {% for entry in students %}
+          {% set s = entry.student %}
+          <article class="card">
+            <header class="card-header">
+              <h2 class="card-title">{{ s.name }}</h2>
+            </header>
+            <div class="card-body">
+              <div class="rating-row">
+                <div class="rating-label">
+                  <span class="pill pill-cf">CF</span>
+                  <span class="platform-name">Codeforces</span>
+                </div>
+                <span class="rating-value">
+                  {{ entry.cf_rating if entry.cf_rating is not none else "---" }}
+                </span>
+              </div>
+              <div class="rating-row">
+                <div class="rating-label">
+                  <span class="pill pill-cc">CC</span>
+                  <span class="platform-name">CodeChef</span>
+                </div>
+                <span class="rating-value">
+                  {{ entry.cc_rating if entry.cc_rating is not none else "---" }}
+                </span>
+              </div>
+              <div class="rating-row">
+                <div class="rating-label">
+                  <span class="pill pill-lc">LC</span>
+                  <span class="platform-name">LeetCode</span>
+                </div>
+                <span class="rating-value">
+                  {{ entry.lc_rating if entry.lc_rating is not none else "---" }}
+                </span>
+              </div>
+            </div>
+            <footer class="card-footer">
+              <a href="{{ url_for('student_dashboard', student_id=s.id) }}" class="btn btn-primary btn-full">
+                View Performance
+              </a>
+            </footer>
+          </article>
+        {% endfor %}
+      </div>
+      {% else %}
+        <p class="empty-state">No students found in the database.</p>
+      {% endif %}
+    </section>
+{% endblock %}
+

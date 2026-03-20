@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{% block title %}StatSnap{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', path='/style.css') }}" />
+    {% block extra_head %}{% endblock %}
+  </head>
+  <body class="app-body">
+    <nav class="navbar">
+      <div class="navbar-inner">
+        <a href="/" class="brand">StatSnap</a>
+        <span class="navbar-subtitle">Weekly contest performance tracker</span>
+      </div>
+    </nav>
+    <main class="app-main">
+      {% block content %}{% endblock %}
+    </main>
+    {% if show_fab %}
+    <button class="fab" type="button" data-modal-open="addStudentModal" aria-label="Add student">
+      +
+    </button>
+
+    <div class="modal-overlay" id="addStudentModal" aria-hidden="true">
+      <div class="modal" role="dialog" aria-modal="true" aria-labelledby="addStudentTitle">
+        <header class="modal-header">
+          <h2 class="modal-title" id="addStudentTitle">Add New Student</h2>
+          <button class="modal-close" type="button" data-modal-close="addStudentModal" aria-label="Close">
+            ×
+          </button>
+        </header>
+        <form method="post" action="{{ url_for('add_student') }}" class="form-vertical modal-body">
+          <label class="form-label">
+            <span>Name</span>
+            <input type="text" name="name" required placeholder="Student name" class="input" />
+          </label>
+          <label class="form-label">
+            <span>Codeforces handle</span>
+            <input type="text" name="cf_handle" required placeholder="e.g. tourist" class="input" />
+          </label>
+          <label class="form-label">
+            <span>CodeChef handle</span>
+            <input type="text" name="cc_handle" required placeholder="e.g. pranav_p" class="input" />
+          </label>
+          <label class="form-label">
+            <span>LeetCode handle</span>
+            <input type="text" name="lc_handle" required placeholder="e.g. your_lc_handle" class="input" />
+          </label>
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Add Student</button>
+            <button type="button" class="btn btn-ghost" data-modal-close="addStudentModal">Cancel</button>
+          </div>
+        </form>
+      </div>
+    </div>
+    {% endif %}
+    {% block extra_scripts %}{% endblock %}
+    <script>
+      (function () {
+        function openModal(id) {
+          const el = document.getElementById(id);
+          if (!el) return;
+          el.classList.add("is-open");
+          el.setAttribute("aria-hidden", "false");
+          const firstInput = el.querySelector("input");
+          if (firstInput) firstInput.focus();
+        }
+
+        function closeModal(id) {
+          const el = document.getElementById(id);
+          if (!el) return;
+          el.classList.remove("is-open");
+          el.setAttribute("aria-hidden", "true");
+        }
+
+        document.addEventListener("click", function (e) {
+          const openBtn = e.target.closest("[data-modal-open]");
+          if (openBtn) {
+            openModal(openBtn.getAttribute("data-modal-open"));
+            return;
+          }
+
+          const closeBtn = e.target.closest("[data-modal-close]");
+          if (closeBtn) {
+            closeModal(closeBtn.getAttribute("data-modal-close"));
+            return;
+          }
+
+          if (e.target.classList && e.target.classList.contains("modal-overlay")) {
+            closeModal(e.target.id);
+          }
+        });
+
+        document.addEventListener("keydown", function (e) {
+          if (e.key !== "Escape") return;
+          const open = document.querySelector(".modal-overlay.is-open");
+          if (open) closeModal(open.id);
+        });
+      })();
+    </script>
+  </body>
+</html>
+

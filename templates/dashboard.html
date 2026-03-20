@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+
+{% block title %}StatSnap · {{ student.name }}{% endblock %}
+
+{% block content %}
+  <section class="panel">
+    <header class="panel-header-row">
+      <div class="header-with-back">
+        <a href="{{ url_for('home') }}" class="btn btn-ghost btn-icon" title="Back to list">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+        </a>
+        <div>
+          <h1 class="panel-title">{{ student.name }}</h1>
+          <p class="panel-subtitle">
+            Contest performance across Codeforces, CodeChef, and LeetCode.
+          </p>
+        </div>
+      </div>
+      <div class="panel-actions">
+        <a href="{{ url_for('edit_student', student_id=student.id) }}" class="btn btn-secondary">Edit Details</a>
+        <form method="post" action="{{ url_for('sync_student', student_id=student.id) }}">
+          <button type="submit" class="btn btn-secondary">Sync Now</button>
+        </form>
+        <form
+          method="post"
+          action="{{ url_for('delete_student', student_id=student.id) }}"
+          onsubmit="return confirm('Delete this student and all their results?');"
+        >
+          <button type="submit" class="btn btn-danger">Delete Student</button>
+        </form>
+      </div>
+    </header>
+  </section>
+
+  <section class="panel">
+    <div class="platform-grid">
+      <div class="platform-section">
+        <header class="platform-header">
+          <h2 class="platform-title cf">Codeforces</h2>
+          {% if platform_status.codeforces %}
+            <p class="status-text">{{ platform_status.codeforces }}</p>
+          {% endif %}
+        </header>
+        <div class="table-wrapper">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Contest Name</th>
+                <th>Date</th>
+                <th>Rating</th>
+                <th>Problems Solved</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for r in results.codeforces %}
+                <tr>
+                  <td>{{ r.contest_name }}</td>
+                  <td>{{ r.contest_date or "-" }}</td>
+                  <td>{{ r.rating if r.rating is not none else "-" }}</td>
+                  <td>{{ r.problems_solved if r.problems_solved is not none else "-" }}</td>
+                </tr>
+              {% else %}
+                <tr>
+                  <td colspan="4" class="empty-cell">No contests yet.</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="platform-section">
+        <header class="platform-header">
+          <h2 class="platform-title cc">CodeChef</h2>
+          {% if platform_status.codechef %}
+            <p class="status-text">{{ platform_status.codechef }}</p>
+          {% endif %}
+        </header>
+        <div class="table-wrapper">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Contest Name</th>
+                <th>Date</th>
+                <th>Rating</th>
+                <th>Problems Solved</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for r in results.codechef %}
+                <tr>
+                  <td>{{ r.contest_name }}</td>
+                  <td>{{ r.contest_date or "-" }}</td>
+                  <td>{{ r.rating if r.rating is not none else "-" }}</td>
+                  <td>{{ r.problems_solved if r.problems_solved is not none else "-" }}</td>
+                </tr>
+              {% else %}
+                <tr>
+                  <td colspan="4" class="empty-cell">No contests yet.</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="platform-section">
+        <header class="platform-header">
+          <h2 class="platform-title lc">LeetCode</h2>
+          {% if platform_status.leetcode %}
+            <p class="status-text">{{ platform_status.leetcode }}</p>
+          {% endif %}
+        </header>
+        <div class="table-wrapper">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Contest Name</th>
+                <th>Date</th>
+                <th>Rating</th>
+                <th>Problems Solved</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for r in results.leetcode %}
+                <tr>
+                  <td>{{ r.contest_name }}</td>
+                  <td>{{ r.contest_date or "-" }}</td>
+                  <td>{{ r.rating if r.rating is not none else "-" }}</td>
+                  <td>{{ r.problems_solved if r.problems_solved is not none else "-" }}</td>
+                </tr>
+              {% else %}
+                <tr>
+                  <td colspan="4" class="empty-cell">No contests yet.</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="report-actions">
+      <a href="{{ url_for('student_report_preview', student_id=student.id) }}" class="btn btn-secondary">
+        Preview Report
+      </a>
+      <a href="{{ url_for('download_report', student_id=student.id) }}" class="btn btn-primary">
+        Download PDF Report
+      </a>
+    </div>
+  </section>
+{% endblock %}
+
