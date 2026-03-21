@@ -21,25 +21,17 @@
         <form method="post" action="{{ url_for('sync_student', student_id=student.id) }}">
           <button type="submit" class="btn btn-secondary">Sync Now</button>
         </form>
-        <form
-          method="post"
-          action="{{ url_for('delete_student', student_id=student.id) }}"
-          onsubmit="return confirm('Delete this student and all their results?');"
-        >
-          <button type="submit" class="btn btn-danger">Delete Student</button>
-        </form>
+        <button type="button" class="btn btn-danger" id="openDeleteModal">Delete Student</button>
       </div>
     </header>
   </section>
 
   <section class="panel">
     <div class="platform-grid">
+      <!-- Platform sections remain identical but structured for clarity -->
       <div class="platform-section">
         <header class="platform-header">
           <h2 class="platform-title cf">Codeforces</h2>
-          {% if platform_status.codeforces %}
-            <p class="status-text">{{ platform_status.codeforces }}</p>
-          {% endif %}
         </header>
         <div class="table-wrapper">
           <table class="table">
@@ -48,7 +40,7 @@
                 <th>Contest Name</th>
                 <th>Date</th>
                 <th>Rating</th>
-                <th>Problems Solved</th>
+                <th>Problems</th>
               </tr>
             </thead>
             <tbody>
@@ -60,9 +52,7 @@
                   <td>{{ r.problems_solved if r.problems_solved is not none else "-" }}</td>
                 </tr>
               {% else %}
-                <tr>
-                  <td colspan="4" class="empty-cell">No contests yet.</td>
-                </tr>
+                <tr><td colspan="4" class="empty-cell">No contests found.</td></tr>
               {% endfor %}
             </tbody>
           </table>
@@ -72,9 +62,6 @@
       <div class="platform-section">
         <header class="platform-header">
           <h2 class="platform-title cc">CodeChef</h2>
-          {% if platform_status.codechef %}
-            <p class="status-text">{{ platform_status.codechef }}</p>
-          {% endif %}
         </header>
         <div class="table-wrapper">
           <table class="table">
@@ -83,7 +70,7 @@
                 <th>Contest Name</th>
                 <th>Date</th>
                 <th>Rating</th>
-                <th>Problems Solved</th>
+                <th>Problems</th>
               </tr>
             </thead>
             <tbody>
@@ -95,9 +82,7 @@
                   <td>{{ r.problems_solved if r.problems_solved is not none else "-" }}</td>
                 </tr>
               {% else %}
-                <tr>
-                  <td colspan="4" class="empty-cell">No contests yet.</td>
-                </tr>
+                <tr><td colspan="4" class="empty-cell">No contests found.</td></tr>
               {% endfor %}
             </tbody>
           </table>
@@ -107,9 +92,6 @@
       <div class="platform-section">
         <header class="platform-header">
           <h2 class="platform-title lc">LeetCode</h2>
-          {% if platform_status.leetcode %}
-            <p class="status-text">{{ platform_status.leetcode }}</p>
-          {% endif %}
         </header>
         <div class="table-wrapper">
           <table class="table">
@@ -118,7 +100,7 @@
                 <th>Contest Name</th>
                 <th>Date</th>
                 <th>Rating</th>
-                <th>Problems Solved</th>
+                <th>Problems</th>
               </tr>
             </thead>
             <tbody>
@@ -130,9 +112,7 @@
                   <td>{{ r.problems_solved if r.problems_solved is not none else "-" }}</td>
                 </tr>
               {% else %}
-                <tr>
-                  <td colspan="4" class="empty-cell">No contests yet.</td>
-                </tr>
+                <tr><td colspan="4" class="empty-cell">No contests found.</td></tr>
               {% endfor %}
             </tbody>
           </table>
@@ -141,13 +121,44 @@
     </div>
 
     <div class="report-actions">
-      <a href="{{ url_for('student_report_preview', student_id=student.id) }}" class="btn btn-secondary">
-        Preview Report
-      </a>
-      <a href="{{ url_for('download_report', student_id=student.id) }}" class="btn btn-primary">
-        Download PDF Report
-      </a>
+      <a href="{{ url_for('student_report_preview', student_id=student.id) }}" class="btn btn-secondary">Preview Report</a>
+      <a href="{{ url_for('download_report', student_id=student.id) }}" class="btn btn-primary">Download PDF Report</a>
     </div>
   </section>
-{% endblock %}
 
+  <!-- Premium Delete Confirmation Modal -->
+  <div class="modal-overlay" id="deleteModalOverlay">
+    <div class="modal" style="max-width: 450px; border-left: 5px solid #ef4444;">
+        <div class="modal-header">
+            <h3 class="modal-title" style="color: #fca5a5;">Confirm Deletion</h3>
+            <button class="modal-close" id="closeDeleteModal">&times;</button>
+        </div>
+        <div class="modal-body" style="text-align: left; padding-top: 0.5rem;">
+            <p style="color: var(--text-muted); line-height: 1.6; margin-bottom: 2rem;">
+                Are you sure you want to delete <strong>{{ student.name }}</strong>? This will permanently remove all their contest data and history. This action cannot be undone.
+            </p>
+            <div style="display: flex; gap: 1rem;">
+                <form method="post" action="{{ url_for('delete_student', student_id=student.id) }}" style="flex: 1;">
+                    <button type="submit" class="btn btn-danger btn-full" style="height: 44px; font-weight: 700;">Yes, Delete Student</button>
+                </form>
+                <button type="button" class="btn btn-ghost" id="cancelDelete" style="flex: 1; height: 44px; font-weight: 600;">Cancel</button>
+            </div>
+        </div>
+    </div>
+  </div>
+
+  <script>
+    const openBtn = document.getElementById('openDeleteModal');
+    const closeBtn = document.getElementById('closeDeleteModal');
+    const cancelBtn = document.getElementById('cancelDelete');
+    const overlay = document.getElementById('deleteModalOverlay');
+
+    const showModal = () => overlay.classList.add('is-open');
+    const hideModal = () => overlay.classList.remove('is-open');
+
+    openBtn.addEventListener('click', showModal);
+    closeBtn.addEventListener('click', hideModal);
+    cancelBtn.addEventListener('click', hideModal);
+    overlay.addEventListener('click', (e) => { if(e.target === overlay) hideModal(); });
+  </script>
+{% endblock %}
