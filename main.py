@@ -19,7 +19,7 @@ from fastapi.templating import Jinja2Templates
 from sqlalchemy import and_, desc, select
 from sqlalchemy.orm import Session
 
-from database import Base, engine, get_db
+from database import Base, engine, get_db, SessionLocal
 import models
 import auth
 from pdf_generator import generate_pdf
@@ -29,7 +29,7 @@ from scrapers.common import PlatformFetchError
 from scrapers.leetcode import fetch_leetcode
 
 # Create DB tables
-Base.metadata.create_all(bind=engine)
+models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="StatSnap")
 app.mount("/static", StaticFiles(directory="static", check_dir=False), name="static")
@@ -38,10 +38,14 @@ templates = Jinja2Templates(directory="templates")
 # Helper to provide user to templates
 @app.middleware("http")
 async def add_user_to_request(request: Request, call_next):
-    db = next(get_db())
-    request.state.user = auth.get_current_user(request, db)
-    response = await call_next(request)
-    return response
+    # Only create a session if we absolutely need to
+    db = SessionLocal()
+    try:
+        request.state.user = auth.get_current_user(request, db)
+        response = await call_next(request)
+        return response
+    finally:
+        db.close()
 
 def _latest_rating_for_platform(db: Session, student_id: int, platform: str) -> int | None:
     stmt = (
