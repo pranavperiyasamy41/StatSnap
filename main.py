@@ -50,12 +50,10 @@ templates = Jinja2Templates(directory="templates")
 async def add_user_to_request(request: Request, call_next):
     db = SessionLocal()
     try:
-        # Extra Layer of Safety: If auth fails, just set user to None
         try:
             request.state.user = auth.get_current_user(request, db)
         except Exception:
             request.state.user = None
-            
         response = await call_next(request)
         return response
     finally:
@@ -88,7 +86,6 @@ async def signup(request: Request, email: str = Form(...), password: str = Form(
         db_user = db.query(models.User).filter(models.User.email == email).first()
         if db_user:
             return templates.TemplateResponse("signup.html", {"request": request, "error": "Email already registered."})
-        
         hashed_password = auth.get_password_hash(password)
         new_user = models.User(email=email, hashed_password=hashed_password)
         db.add(new_user)
@@ -107,7 +104,6 @@ async def login(request: Request, email: str = Form(...), password: str = Form(.
     user = db.query(models.User).filter(models.User.email == email).first()
     if not user or not auth.verify_password(password, user.hashed_password):
         return templates.TemplateResponse("login.html", {"request": request, "error": "Invalid credentials."})
-    
     access_token = auth.create_access_token(data={"sub": user.email})
     res = RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
     res.set_cookie(key="access_token", value=f"Bearer {access_token}", httponly=True)
@@ -124,7 +120,6 @@ async def logout():
 async def home(request: Request, db: Session = Depends(get_db)):
     user = getattr(request.state, "user", None)
     if not user: return RedirectResponse(url="/login")
-    
     students = db.query(models.Student).filter(models.Student.owner_id == user.id).all()
     cards = []
     for s in students:
@@ -140,7 +135,6 @@ async def home(request: Request, db: Session = Depends(get_db)):
 async def add_student(request: Request, name: str = Form(...), cf_handle: str = Form(""), cc_handle: str = Form(""), lc_handle: str = Form(""), db: Session = Depends(get_db)):
     user = getattr(request.state, "user", None)
     if not user: return RedirectResponse(url="/login")
-    
     student = models.Student(name=name, cf_handle=cf_handle, cc_handle=cc_handle, lc_handle=lc_handle, owner_id=user.id)
     db.add(student)
     db.commit()
@@ -150,33 +144,24 @@ async def add_student(request: Request, name: str = Form(...), cf_handle: str = 
 async def student_dashboard(request: Request, student_id: int, db: Session = Depends(get_db)):
     user = getattr(request.state, "user", None)
     if not user: return RedirectResponse(url="/login")
-    
     student = db.query(models.Student).filter(models.Student.id == student_id, models.Student.owner_id == user.id).first()
     if not student: raise HTTPException(status_code=404)
-    
     results = db.query(models.ContestResult).filter(models.ContestResult.student_id == student.id).order_by(models.ContestResult.contest_date).all()
     grouped = {"codeforces": [], "codechef": [], "leetcode": []}
     for r in results:
         key = r.platform.lower()
         if key in grouped: grouped[key].append(r)
-        
     return templates.TemplateResponse("dashboard.html", {
-        "request": request, 
-        "student": student, 
-        "results": grouped, 
-        "user": user,
-        "platform_status": {} 
+        "request": request, "student": student, "results": grouped, "user": user, "platform_status": {}
     })
 
-@app.post("/student/{student_id}/sync")
+@app.post("/student/{student_id}/sync", name="sync_student")
 async def sync_student(request: Request, student_id: int, db: Session = Depends(get_db)):
     user = getattr(request.state, "user", None)
     if not user: return RedirectResponse(url="/login")
-    
     student = db.query(models.Student).filter(models.Student.id == student_id, models.Student.owner_id == user.id).first()
     if not student: raise HTTPException(status_code=404)
     
-    # Sync Logic
     tasks = []
     if student.cf_handle: tasks.append(("codeforces", fetch_codeforces(student.cf_handle)))
     if student.cc_handle: tasks.append(("codechef", fetch_codechef(student.cc_handle)))
@@ -185,49 +170,51 @@ async def sync_student(request: Request, student_id: int, db: Session = Depends(
     if tasks:
         platforms = [t[0] for t in tasks]
         results = await asyncio.gather(*[t[1] for t in tasks], return_exceptions=True)
-        
         for platform, data in zip(platforms, results):
-            if isinstance(data, Exception): continue
-            
-            db.query(models.ContestResult).filter(
-                models.ContestResult.student_id == student.id, 
-                models.ContestResult.platform == platform
-            ).delete()
-            
-            for row in data:
-                db.add(models.ContestResult(
-                    student_id=student.id,
-                    platform=platform,
-                    contest_name=row["contest_name"],
-                    contest_date=row.get("contest_date"),
-                    rating=row.get("rating"),
-                    problems_solved=row.get("problems_solved")
-                ))
+            if not isinstance(data, Exception):
+                db.query(models.ContestResult).filter(models.ContestResult.student_id == student.id, models.ContestResult.platform == platform).delete()
+                for row in data:
+                    db.add(models.ContestResult(student_id=student.id, platform=platform, contest_name=row["contest_name"], contest_date=row.get("contest_date"), rating=row.get("rating"), problems_solved=row.get("problems_solved")))
         db.commit()
-        
     return RedirectResponse(url=f"/student/{student.id}", status_code=status.HTTP_303_SEE_OTHER)
 
-@app.get("/student/{student_id}/edit", response_class=HTMLResponse)
+@app.get("/student/{student_id}/edit", name="edit_student", response_class=HTMLResponse)
 async def edit_student(request: Request, student_id: int, db: Session = Depends(get_db)):
     user = getattr(request.state, "user", None)
     student = db.query(models.Student).filter(models.Student.id == student_id, models.Student.owner_id == user.id).first()
     return templates.TemplateResponse("edit_student.html", {"request": request, "student": student, "user": user})
 
 @app.post("/student/{student_id}/edit")
-async def edit_student_post(request: Request, student_id: int, name: str = Form(...), cf_handle: str = Form(""), cc_handle: str = Form(""), lc_handle: str = Form(""), db: Session = Depends(get_db)):
+async def edit_student_post(student_id: int, name: str = Form(...), cf_handle: str = Form(""), cc_handle: str = Form(""), lc_handle: str = Form(""), db: Session = Depends(get_db), request: Request = None):
     user = getattr(request.state, "user", None)
     student = db.query(models.Student).filter(models.Student.id == student_id, models.Student.owner_id == user.id).first()
     student.name, student.cf_handle, student.cc_handle, student.lc_handle = name, cf_handle, cc_handle, lc_handle
     db.commit()
     return RedirectResponse(url=f"/student/{student.id}", status_code=status.HTTP_303_SEE_OTHER)
 
-@app.post("/student/{student_id}/delete")
+@app.post("/student/{student_id}/delete", name="delete_student")
 async def delete_student(request: Request, student_id: int, db: Session = Depends(get_db)):
     user = getattr(request.state, "user", None)
     student = db.query(models.Student).filter(models.Student.id == student_id, models.Student.owner_id == user.id).first()
     db.delete(student)
     db.commit()
     return RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
+
+@app.get("/student/{student_id}/preview", name="student_report_preview", response_class=HTMLResponse)
+async def student_report_preview(request: Request, student_id: int, db: Session = Depends(get_db)):
+    user = getattr(request.state, "user", None)
+    student = db.query(models.Student).filter(models.Student.id == student_id, models.Student.owner_id == user.id).first()
+    results = db.query(models.ContestResult).filter(models.ContestResult.student_id == student.id).all()
+    summary = {"total_contests": len(results), "total_problems": sum(r.problems_solved or 0 for r in results), "peak_rating": max((r.rating for r in results if r.rating), default=0)}
+    return templates.TemplateResponse("report_preview.html", {"request": request, "student": student, "summary": summary, "today": dt.date.today().isoformat(), "user": user})
+
+@app.get("/student/{student_id}/report", name="download_report")
+async def download_report(student_id: int, db: Session = Depends(get_db), request: Request = None):
+    user = getattr(request.state, "user", None)
+    student = db.query(models.Student).filter(models.Student.id == student_id, models.Student.owner_id == user.id).first()
+    results = db.query(models.ContestResult).filter(models.ContestResult.student_id == student.id).order_by(models.ContestResult.contest_date).all()
+    pdf_bytes = generate_pdf(student, results)
+    return StreamingResponse(iter([pdf_bytes]), media_type="application/pdf", headers={"Content-Disposition": f'attachment; filename="{student.name}_report.pdf"'})
 
 @app.get("/health")
 async def health(): return {"status": "ok"}
