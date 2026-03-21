@@ -4,23 +4,25 @@
     <title>StatSnap</title>
     <link rel="stylesheet" href="/static/style.css">
 </head>
-<body>
-    <nav class="nav">
-        <div class="container" style="display: flex; justify-content: space-between; align-items: center;">
-            <a href="/" style="font-weight: bold; font-size: 1.2rem; text-decoration: none; color: #333;">StatSnap</a>
-            <div class="nav-links">
+<body class="app-body">
+    <nav class="navbar">
+        <div class="navbar-inner">
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                <a href="/" class="brand">StatSnap</a>
+                <span class="navbar-subtitle">CP Stats Tracker</span>
+            </div>
+            <div class="nav-links" style="display: flex; align-items: center; gap: 1.25rem; font-size: 0.85rem;">
                 {% if request.state.user %}
-                    <span style="margin-right: 15px;">Hello, {{ request.state.user.email }}</span>
-                    <a href="/" style="margin-right: 10px;">Dashboard</a>
-                    <a href="/logout" style="color: red;">Logout</a>
+                    <span style="color: var(--text-muted)">{{ request.state.user.email }}</span>
+                    <a href="/logout" class="btn btn-ghost" style="padding: 0.35rem 0.8rem;">Logout</a>
                 {% else %}
-                    <a href="/login" style="margin-right: 10px;">Login</a>
-                    <a href="/signup">Sign Up</a>
+                    <a href="/login" style="color: var(--text-muted)">Login</a>
+                    <a href="/signup" class="btn btn-primary" style="padding: 0.35rem 1rem;">Sign Up</a>
                 {% endif %}
             </div>
         </div>
     </nav>
-    <main>
+    <main class="app-main">
         {% block content %}{% endblock %}
     </main>
 </body>
