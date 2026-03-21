@@ -47,7 +47,7 @@
               </div>
             </div>
             <footer class="card-footer">
-              <a href="{{ url_for('student_dashboard', student_id=s.id) }}" class="btn btn-primary btn-full">
+              <a href="/student/{{ s.id }}" class="btn btn-primary btn-full">
                 View Performance
               </a>
             </footer>
@@ -55,8 +55,71 @@
         {% endfor %}
       </div>
       {% else %}
-        <p class="empty-state">No students found in the database.</p>
+        <div class="panel" style="text-align: center; padding: 4rem 2rem;">
+            <p class="empty-state">No students found. Click the + button to add your first student!</p>
+        </div>
       {% endif %}
+    </section>
+
+    <!-- Floating Action Button -->
+    <button class="fab" id="openModal">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+    </button>
+
+    <!-- Add Student Modal -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title">Add New Student</h3>
+                <button class="modal-close" id="closeModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form action="/student/add" method="post" class="form-vertical">
+                    <label class="form-label">
+                        Student Name
+                        <input type="text" name="name" class="input" placeholder="Enter student name" required>
+                    </label>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <label class="form-label">
+                            Codeforces Handle
+                            <input type="text" name="cf_handle" class="input" placeholder="cf_username">
+                        </label>
+                        <label class="form-label">
+                            CodeChef Handle
+                            <input type="text" name="cc_handle" class="input" placeholder="cc_username">
+                        </label>
+                    </div>
+                    <label class="form-label">
+                        LeetCode Handle
+                        <input type="text" name="lc_handle" class="input" placeholder="lc_username">
+                    </label>
+                    <div class="form-actions" style="margin-top: 1.5rem;">
+                        <button type="submit" class="btn btn-primary" style="padding: 0.6rem 2rem;">Add Student</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const openModal = document.getElementById('openModal');
+        const closeModal = document.getElementById('closeModal');
+        const modalOverlay = document.getElementById('modalOverlay');
+
+        openModal.addEventListener('click', () => {
+            modalOverlay.classList.add('is-open');
+        });
+
+        closeModal.addEventListener('click', () => {
+            modalOverlay.classList.remove('is-open');
+        });
+
+        modalOverlay.addEventListener('click', (e) => {
+            if (e.target === modalOverlay) {
+                modalOverlay.classList.remove('is-open');
+            }
+        });
+    </script>
     </section>
 {% endblock %}
 
