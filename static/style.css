@@ -638,42 +638,78 @@ a:hover {
   width: 100%;
   max-width: 520px;
   background: radial-gradient(circle at top left, #1e293b 0, #020617 70%);
-  border: 1px solid rgba(55, 65, 81, 0.95);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-soft);
+  border: 1px solid rgba(59, 130, 246, 0.25);
+  border-radius: 20px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8), 0 0 30px rgba(59, 130, 246, 0.1);
   overflow: hidden;
+  animation: modalSlideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes modalSlideIn {
+  from { opacity: 0; transform: translateY(30px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
 }
 
 .modal-header {
-  padding: 1rem 1.1rem;
+  padding: 1.75rem 2.25rem 1.25rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border-bottom: 1px solid rgba(31, 41, 55, 0.9);
 }
 
 .modal-title {
   margin: 0;
-  font-size: 1.05rem;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: -0.01em;
 }
 
 .modal-close {
-  width: 34px;
-  height: 34px;
-  border-radius: 999px;
-  border: 1px solid rgba(55, 65, 81, 0.9);
-  background: rgba(15, 23, 42, 0.9);
-  color: var(--text-main);
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  border: 1px solid rgba(55, 65, 81, 0.8);
+  background: rgba(31, 41, 55, 0.5);
+  color: var(--text-muted);
   cursor: pointer;
-  font-size: 20px;
-  line-height: 1;
+  font-size: 1.25rem;
+  transition: all 0.2s ease;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .modal-close:hover {
-  background: rgba(31, 41, 55, 0.9);
+  background: rgba(239, 68, 68, 0.15);
+  border-color: rgba(239, 68, 68, 0.4);
+  color: #fca5a5;
+}
+
+.modal-body {
+  padding: 0 2.25rem 2.25rem;
+}
+
+.form-vertical {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.input-group-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+}
+
+@media (max-width: 480px) {
+  .input-group-row {
+    grid-template-columns: 1fr;
+  }
+  .modal-header, .modal-body {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
 }
 
 .auth-container {
