@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 from database import get_db
 import models
 
-# Secret key to sign JWT tokens (use a real one in production)
+# Secret key to sign JWT tokens
 SECRET_KEY = os.getenv("SECRET_KEY", "your-secret-key-for-portfolio-purposes")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24  # 24 hours
@@ -29,15 +29,15 @@ def verify_password(plain_password: str, hashed_password: str):
 
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     to_encode = data.copy()
-    if expires_delta:
-        expire = datetime.utcnow() + expires_delta
-    else:
-        expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    expire = datetime.utcnow() + (expires_delta or timedelta(minutes=15))
     to_encode.update({"exp": expire})
-    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
-    return encoded_jwt
+    return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 
 def get_current_user(request: Request, db: Session = Depends(get_db)):
+    """
+    Safely retrieves the current user. 
+    Returns None instead of raising an error if the user is not logged in.
+    """
     token = request.cookies.get("access_token")
     if not token:
         return None
@@ -51,8 +51,7 @@ def get_current_user(request: Request, db: Session = Depends(get_db)):
         if email is None:
             return None
         
-        user = db.query(models.User).filter(models.User.email == email).first()
-        return user
+        return db.query(models.User).filter(models.User.email == email).first()
     except Exception:
-        # If token is expired or invalid, just return None (don't crash)
+        # Return None for any error (expired token, invalid format, etc.)
         return None
