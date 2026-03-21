@@ -1,51 +1,52 @@
 {% extends "base.html" %}
 
-{% block title %}Edit Student · {{ student.name }} | StatSnap{% endblock %}
+{% block title %}Edit · {{ student.name }}{% endblock %}
 
 {% block content %}
-<section class="panel">
-  <header class="panel-header-row">
-    <div class="header-with-back">
-      <a href="{{ url_for('student_dashboard', student_id=student.id) }}" class="btn btn-ghost btn-icon" title="Back to Dashboard">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
-      </a>
-      <div>
-        <h1 class="panel-title">Edit Student Details</h1>
-        <p class="panel-subtitle">Update profiles and platform handles for {{ student.name }}.</p>
-      </div>
+<div class="auth-container" style="min-height: calc(100vh - 100px);">
+    <div class="auth-panel" style="max-width: 550px; border-left: 4px solid var(--accent); position: relative;">
+        <!-- Compact Header -->
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2rem;">
+            <div style="text-align: left;">
+                <h1 class="auth-title" style="font-size: 1.4rem;">Edit Details</h1>
+                <p class="auth-subtitle" style="margin-bottom: 0;">Updating profiles for <strong>{{ student.name }}</strong></p>
+            </div>
+            <a href="{{ url_for('student_dashboard', student_id=student.id) }}" class="modal-close" style="text-decoration: none;">&times;</a>
+        </div>
+
+        {% if error %}
+        <div class="auth-error-box">
+            {{ error }}
+        </div>
+        {% endif %}
+
+        <form method="post" action="{{ url_for('edit_student', student_id=student.id) }}" class="auth-form">
+            <div class="auth-input-group">
+                <label>Full Name</label>
+                <input type="text" name="name" value="{{ student.name }}" required class="input" placeholder="e.g. John Doe">
+            </div>
+            
+            <div class="input-group-row">
+                <div class="auth-input-group">
+                    <label>Codeforces</label>
+                    <input type="text" name="cf_handle" value="{{ student.cf_handle or '' }}" class="input" placeholder="handle">
+                </div>
+                <div class="auth-input-group">
+                    <label>CodeChef</label>
+                    <input type="text" name="cc_handle" value="{{ student.cc_handle or '' }}" class="input" placeholder="handle">
+                </div>
+            </div>
+
+            <div class="auth-input-group">
+                <label>LeetCode</label>
+                <input type="text" name="lc_handle" value="{{ student.lc_handle or '' }}" class="input" placeholder="username">
+            </div>
+
+            <div style="margin-top: 1.5rem; display: flex; gap: 1rem;">
+                <button type="submit" class="btn btn-primary" style="flex: 2; height: 44px;">Save Updates</button>
+                <a href="{{ url_for('student_dashboard', student_id=student.id) }}" class="btn btn-ghost" style="flex: 1; height: 44px; display: flex; align-items: center; justify-content: center;">Cancel</a>
+            </div>
+        </form>
     </div>
-  </header>
-</section>
-
-<section class="panel" style="padding: 3rem 2.5rem;">
-  <form method="post" action="{{ url_for('edit_student', student_id=student.id) }}" class="form-vertical" style="max-width: 600px; margin: 0 auto;">
-    
-    <label class="form-label">
-        <span>Full Name</span>
-        <input type="text" name="name" value="{{ student.name }}" required class="input" placeholder="Enter student name" />
-    </label>
-    
-    <div class="input-group-row">
-        <label class="form-label">
-            <span>Codeforces Handle</span>
-            <input type="text" name="cf_handle" value="{{ student.cf_handle or '' }}" class="input" placeholder="cf_username" />
-        </label>
-
-        <label class="form-label">
-            <span>CodeChef Handle</span>
-            <input type="text" name="cc_handle" value="{{ student.cc_handle or '' }}" class="input" placeholder="cc_username" />
-        </label>
-    </div>
-
-    <label class="form-label">
-        <span>LeetCode Handle</span>
-        <input type="text" name="lc_handle" value="{{ student.lc_handle or '' }}" class="input" placeholder="lc_username" />
-    </label>
-
-    <div class="form-actions" style="margin-top: 2rem; padding-top: 2rem; border-top: 1px solid rgba(55, 65, 81, 0.3); gap: 1rem;">
-      <button type="submit" class="btn btn-primary" style="padding: 0.7rem 2.5rem;">Save Changes</button>
-      <a href="{{ url_for('student_dashboard', student_id=student.id) }}" class="btn btn-ghost" style="padding: 0.7rem 2rem;">Cancel</a>
-    </div>
-  </form>
-</section>
+</div>
 {% endblock %}
