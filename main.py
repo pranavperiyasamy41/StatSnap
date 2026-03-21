@@ -71,21 +71,21 @@ async def signup_page(request: Request):
 @app.post("/signup")
 async def signup(request: Request, email: str = Form(...), password: str = Form(...), db: Session = Depends(get_db)):
     # Check if user already exists
-    db_user = db.query(models.User).filter(models.User.email == email).first()
-    if db_user:
-        return templates.TemplateResponse("signup.html", {
-            "request": request,
-            "error": "Email already registered. Try logging in."
-        })
-    
-    # Minimal validation
-    if len(password) < 6:
-        return templates.TemplateResponse("signup.html", {
-            "request": request,
-            "error": "Password must be at least 6 characters."
-        })
-
     try:
+        db_user = db.query(models.User).filter(models.User.email == email).first()
+        if db_user:
+            return templates.TemplateResponse("signup.html", {
+                "request": request,
+                "error": "Email already registered. Try logging in."
+            })
+        
+        # Minimal validation
+        if len(password) < 6:
+            return templates.TemplateResponse("signup.html", {
+                "request": request,
+                "error": "Password must be at least 6 characters."
+            })
+
         hashed_password = auth.get_password_hash(password)
         new_user = models.User(email=email, hashed_password=hashed_password)
         db.add(new_user)
@@ -93,6 +93,7 @@ async def signup(request: Request, email: str = Form(...), password: str = Form(
         return RedirectResponse(url="/login", status_code=status.HTTP_303_SEE_OTHER)
     except Exception as e:
         db.rollback()
+        print(f"Signup error: {e}")
         return templates.TemplateResponse("signup.html", {
             "request": request,
             "error": "An error occurred during signup. Please try again."
@@ -104,18 +105,25 @@ async def login_page(request: Request):
 
 @app.post("/login")
 async def login(request: Request, email: str = Form(...), password: str = Form(...), db: Session = Depends(get_db)):
-    user = db.query(models.User).filter(models.User.email == email).first()
-    
-    if not user or not auth.verify_password(password, user.hashed_password):
+    try:
+        user = db.query(models.User).filter(models.User.email == email).first()
+        
+        if not user or not auth.verify_password(password, user.hashed_password):
+            return templates.TemplateResponse("login.html", {
+                "request": request,
+                "error": "Invalid email or password."
+            })
+        
+        access_token = auth.create_access_token(data={"sub": user.email})
+        res = RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
+        res.set_cookie(key="access_token", value=f"Bearer {access_token}", httponly=True)
+        return res
+    except Exception as e:
+        print(f"Login error: {e}")
         return templates.TemplateResponse("login.html", {
             "request": request,
-            "error": "Invalid email or password."
+            "error": "An error occurred during login."
         })
-    
-    access_token = auth.create_access_token(data={"sub": user.email})
-    res = RedirectResponse(url="/", status_code=status.HTTP_303_SEE_OTHER)
-    res.set_cookie(key="access_token", value=f"Bearer {access_token}", httponly=True)
-    return res
 
 @app.get("/logout")
 async def logout():

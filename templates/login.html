@@ -1,13 +1,14 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="auth-wrapper">
-    <div class="auth-card">
-        <h1 class="auth-title">Welcome back</h1>
-        <p class="auth-subtitle">Sign in to your account to access your students and track their progress.</p>
+<div class="auth-container">
+    <div class="auth-panel">
+        <div class="auth-header">
+            <h1 class="auth-title">Welcome back</h1>
+            <p class="auth-subtitle">Sign in to your StatSnap account</p>
+        </div>
         
         {% if error %}
-        <div class="auth-error">
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        <div class="auth-error-box">
             {{ error }}
         </div>
         {% endif %}
@@ -15,19 +16,19 @@
         <form action="/login" method="post" class="auth-form">
             <div class="auth-input-group">
                 <label for="email">Email Address</label>
-                <input type="email" id="email" name="email" class="auth-input" placeholder="name@example.com" required>
+                <input type="email" id="email" name="email" class="input" placeholder="name@example.com" required>
             </div>
             <div class="auth-input-group">
                 <label for="password">Password</label>
-                <input type="password" id="password" name="password" class="auth-input" placeholder="••••••••" required>
+                <input type="password" id="password" name="password" class="input" placeholder="••••••••" required>
             </div>
-            <div style="margin-top: 2rem;">
-                <button type="submit" class="btn btn-primary btn-full" style="height: 46px; font-size: 0.95rem;">Log In</button>
+            <div style="margin-top: 1rem;">
+                <button type="submit" class="btn btn-primary btn-full" style="height: 44px;">Log In</button>
             </div>
         </form>
         
         <div class="auth-footer">
-            New to StatSnap? <a href="/signup">Create an account</a>
+            Don't have an account? <a href="/signup">Sign up for free</a>
         </div>
     </div>
 </div>
