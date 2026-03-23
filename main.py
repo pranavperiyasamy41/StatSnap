@@ -29,7 +29,25 @@ from scrapers.codeforces import fetch_codeforces
 from scrapers.leetcode import fetch_leetcode
 
 # Create DB tables
-models.Base.metadata.create_all(bind=engine)
+try:
+    models.Base.metadata.create_all(bind=engine)
+    # Simple migration for Render (Postgres)
+    from sqlalchemy import text
+    with engine.connect() as conn:
+        # Check if owner_id exists, if not add it
+        try:
+            conn.execute(text("ALTER TABLE students ADD COLUMN owner_id INTEGER REFERENCES users(id) ON DELETE CASCADE"))
+            conn.commit()
+        except Exception:
+            pass
+        # Check if created_at exists, if not add it
+        try:
+            conn.execute(text("ALTER TABLE students ADD COLUMN created_at TIMESTAMP WITH TIME ZONE"))
+            conn.commit()
+        except Exception:
+            pass
+except Exception as e:
+    print(f"Database sync error: {e}")
 
 app = FastAPI(title="StatSnap")
 
