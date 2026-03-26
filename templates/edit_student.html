@@ -3,53 +3,44 @@
 {% block title %}Edit · {{ student.name }}{% endblock %}
 
 {% block content %}
-<div class="auth-container" style="min-height: calc(100vh - 120px); display: flex; align-items: center; justify-content: center;">
-    <div class="auth-panel" style="max-width: 580px; padding: 3.5rem 3rem; border-left: 5px solid var(--accent); position: relative; box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.8);">
-        
-        <!-- Header Section with Better Spacing -->
-        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2.5rem;">
-            <div style="text-align: left;">
-                <h1 class="auth-title" style="font-size: 1.6rem; margin-bottom: 0.5rem; letter-spacing: -0.02em;">Edit Student</h1>
-                <p class="auth-subtitle" style="margin-bottom: 0; font-size: 0.95rem;">Updating profile configuration for <span style="color: var(--text-main); font-weight: 600;">{{ student.name }}</span></p>
-            </div>
-            <a href="{{ url_for('student_dashboard', student_id=student.id) }}" class="modal-close" style="text-decoration: none; transition: transform 0.2s ease;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">&times;</a>
+<div class="auth-container">
+    <div class="auth-panel">
+        <div class="auth-header">
+            <h1 class="auth-title">Edit Student</h1>
+            <p class="auth-subtitle">Updating profile configuration for <strong>{{ student.name }}</strong></p>
         </div>
 
         {% if error %}
-        <div class="auth-error-box" style="margin-bottom: 2rem;">
+        <div class="auth-error-box">
             {{ error }}
         </div>
         {% endif %}
 
-        <form method="post" action="{{ url_for('edit_student', student_id=student.id) }}" class="auth-form" style="gap: 1.75rem;">
-            <!-- Name Input -->
+        <form method="post" action="{{ url_for('edit_student', student_id=student.id) }}" class="auth-form">
             <div class="auth-input-group">
-                <label style="margin-bottom: 0.6rem; display: block; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em;">Full Name</label>
-                <input type="text" name="name" value="{{ student.name }}" required class="input" style="height: 46px; padding: 0 1rem;" placeholder="e.g. John Doe">
+                <label>Full Name</label>
+                <input type="text" name="name" value="{{ student.name }}" required class="input" placeholder="e.g. John Doe">
             </div>
             
-            <!-- Handles Row -->
-            <div class="input-group-row" style="gap: 1.5rem;">
+            <div class="input-group-row">
                 <div class="auth-input-group">
-                    <label style="margin-bottom: 0.6rem; display: block; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em;">Codeforces</label>
-                    <input type="text" name="cf_handle" value="{{ student.cf_handle or '' }}" class="input" style="height: 46px; padding: 0 1rem;" placeholder="handle">
+                    <label>Codeforces</label>
+                    <input type="text" name="cf_handle" value="{{ student.cf_handle or '' }}" class="input" placeholder="handle">
                 </div>
                 <div class="auth-input-group">
-                    <label style="margin-bottom: 0.6rem; display: block; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em;">CodeChef</label>
-                    <input type="text" name="cc_handle" value="{{ student.cc_handle or '' }}" class="input" style="height: 46px; padding: 0 1rem;" placeholder="handle">
+                    <label>CodeChef</label>
+                    <input type="text" name="cc_handle" value="{{ student.cc_handle or '' }}" class="input" placeholder="handle">
                 </div>
             </div>
 
-            <!-- LeetCode Input -->
             <div class="auth-input-group">
-                <label style="margin-bottom: 0.6rem; display: block; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em;">LeetCode</label>
-                <input type="text" name="lc_handle" value="{{ student.lc_handle or '' }}" class="input" style="height: 46px; padding: 0 1rem;" placeholder="username">
+                <label>LeetCode</label>
+                <input type="text" name="lc_handle" value="{{ student.lc_handle or '' }}" class="input" placeholder="username">
             </div>
 
-            <!-- Action Buttons -->
-            <div style="margin-top: 2.5rem; display: flex; gap: 1.25rem; border-top: 1px solid rgba(55, 65, 81, 0.3); padding-top: 2.5rem;">
-                <button type="submit" class="btn btn-primary" style="flex: 2; height: 48px; font-weight: 700; font-size: 0.95rem;">Save Changes</button>
-                <a href="{{ url_for('student_dashboard', student_id=student.id) }}" class="btn btn-ghost" style="flex: 1; height: 48px; display: flex; align-items: center; justify-content: center; font-weight: 600;">Cancel</a>
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary" style="flex: 2;">Save Changes</button>
+                <a href="{{ url_for('student_dashboard', student_id=student.id) }}" class="btn btn-ghost" style="flex: 1;">Cancel</a>
             </div>
         </form>
     </div>

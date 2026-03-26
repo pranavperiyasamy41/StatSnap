@@ -1,23 +1,30 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>StatSnap</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}StatSnap{% endblock %}</title>
     <link rel="stylesheet" href="/static/style.css">
 </head>
 <body class="app-body">
     <nav class="navbar">
         <div class="navbar-inner">
-            <div style="display: flex; align-items: center; gap: 1rem;">
+            <div class="navbar-brand-group">
                 <a href="/" class="brand">StatSnap</a>
                 <span class="navbar-subtitle">CP Stats Tracker</span>
             </div>
-            <div class="nav-links" style="display: flex; align-items: center; gap: 1.25rem; font-size: 0.85rem;">
+            
+            <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+            </button>
+
+            <div class="nav-links" id="navLinks">
                 {% if request.state.user %}
-                    <span style="color: var(--text-muted)">{{ request.state.user.email }}</span>
-                    <a href="/logout" class="btn btn-ghost" style="padding: 0.35rem 0.8rem;">Logout</a>
+                    <span class="user-email">{{ request.state.user.email }}</span>
+                    <a href="/logout" class="btn btn-ghost nav-btn">Logout</a>
                 {% else %}
-                    <a href="/login" style="color: var(--text-muted)">Login</a>
-                    <a href="/signup" class="btn btn-primary" style="padding: 0.35rem 1rem;">Sign Up</a>
+                    <a href="/login" class="nav-link">Login</a>
+                    <a href="/signup" class="btn btn-primary nav-btn">Sign Up</a>
                 {% endif %}
             </div>
         </div>
@@ -25,5 +32,16 @@
     <main class="app-main">
         {% block content %}{% endblock %}
     </main>
+
+    <script>
+        const menuToggle = document.getElementById('menuToggle');
+        const navLinks = document.getElementById('navLinks');
+
+        if (menuToggle && navLinks) {
+            menuToggle.addEventListener('click', () => {
+                navLinks.classList.toggle('is-active');
+            });
+        }
+    </script>
 </body>
 </html>

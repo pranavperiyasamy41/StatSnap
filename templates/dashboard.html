@@ -12,7 +12,7 @@
         <div>
           <h1 class="panel-title">{{ student.name }}</h1>
           <p class="panel-subtitle">
-            Contest performance across Codeforces, CodeChef, and LeetCode.
+            Contest performance across platforms.
           </p>
         </div>
       </div>
@@ -26,122 +26,115 @@
     </header>
   </section>
 
-  <section class="panel">
-    <div class="platform-grid">
-      <!-- Platform sections remain identical but structured for clarity -->
-      <div class="platform-section">
-        <header class="platform-header">
-          <h2 class="platform-title cf">Codeforces</h2>
-        </header>
-        <div class="table-wrapper">
-          <table class="table">
-            <thead>
+  <div class="platform-grid">
+    <div class="platform-section">
+      <header class="platform-header">
+        <h2 class="platform-title cf">Codeforces</h2>
+      </header>
+      <div class="table-wrapper">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Contest</th>
+              <th>Rating</th>
+              <th>Solved</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for r in results.codeforces %}
               <tr>
-                <th>Contest Name</th>
-                <th>Date</th>
-                <th>Rating</th>
-                <th>Problems</th>
+                <td>{{ r.contest_name }}</td>
+                <td>{{ r.rating if r.rating is not none else "-" }}</td>
+                <td>{{ r.problems_solved if r.problems_solved is not none else "-" }}</td>
               </tr>
-            </thead>
-            <tbody>
-              {% for r in results.codeforces %}
-                <tr>
-                  <td>{{ r.contest_name }}</td>
-                  <td>{{ r.contest_date or "-" }}</td>
-                  <td>{{ r.rating if r.rating is not none else "-" }}</td>
-                  <td>{{ r.problems_solved if r.problems_solved is not none else "-" }}</td>
-                </tr>
-              {% else %}
-                <tr><td colspan="4" class="empty-cell">No contests found.</td></tr>
-              {% endfor %}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <div class="platform-section">
-        <header class="platform-header">
-          <h2 class="platform-title cc">CodeChef</h2>
-        </header>
-        <div class="table-wrapper">
-          <table class="table">
-            <thead>
-              <tr>
-                <th>Contest Name</th>
-                <th>Date</th>
-                <th>Rating</th>
-                <th>Problems</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for r in results.codechef %}
-                <tr>
-                  <td>{{ r.contest_name }}</td>
-                  <td>{{ r.contest_date or "-" }}</td>
-                  <td>{{ r.rating if r.rating is not none else "-" }}</td>
-                  <td>{{ r.problems_solved if r.problems_solved is not none else "-" }}</td>
-                </tr>
-              {% else %}
-                <tr><td colspan="4" class="empty-cell">No contests found.</td></tr>
-              {% endfor %}
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <div class="platform-section">
-        <header class="platform-header">
-          <h2 class="platform-title lc">LeetCode</h2>
-        </header>
-        <div class="table-wrapper">
-          <table class="table">
-            <thead>
-              <tr>
-                <th>Contest Name</th>
-                <th>Date</th>
-                <th>Rating</th>
-                <th>Problems</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for r in results.leetcode %}
-                <tr>
-                  <td>{{ r.contest_name }}</td>
-                  <td>{{ r.contest_date or "-" }}</td>
-                  <td>{{ r.rating if r.rating is not none else "-" }}</td>
-                  <td>{{ r.problems_solved if r.problems_solved is not none else "-" }}</td>
-                </tr>
-              {% else %}
-                <tr><td colspan="4" class="empty-cell">No contests found.</td></tr>
-              {% endfor %}
-            </tbody>
-          </table>
-        </div>
+            {% else %}
+              <tr><td colspan="3" class="empty-cell">No contests found.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
       </div>
     </div>
 
+    <div class="platform-section">
+      <header class="platform-header">
+        <h2 class="platform-title cc">CodeChef</h2>
+      </header>
+      <div class="table-wrapper">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Contest</th>
+              <th>Rating</th>
+              <th>Solved</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for r in results.codechef %}
+              <tr>
+                <td>{{ r.contest_name }}</td>
+                <td>{{ r.rating if r.rating is not none else "-" }}</td>
+                <td>{{ r.problems_solved if r.problems_solved is not none else "-" }}</td>
+              </tr>
+            {% else %}
+              <tr><td colspan="3" class="empty-cell">No contests found.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="platform-section">
+      <header class="platform-header">
+        <h2 class="platform-title lc">LeetCode</h2>
+      </header>
+      <div class="table-wrapper">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Contest</th>
+              <th>Rating</th>
+              <th>Solved</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for r in results.leetcode %}
+              <tr>
+                <td>{{ r.contest_name }}</td>
+                <td>{{ r.rating if r.rating is not none else "-" }}</td>
+                <td>{{ r.problems_solved if r.problems_solved is not none else "-" }}</td>
+              </tr>
+            {% else %}
+              <tr><td colspan="3" class="empty-cell">No contests found.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <section class="panel" style="margin-top: 1.5rem;">
     <div class="report-actions">
       <a href="{{ url_for('student_report_preview', student_id=student.id) }}" class="btn btn-secondary">Preview Report</a>
       <a href="{{ url_for('download_report', student_id=student.id) }}" class="btn btn-primary">Download PDF Report</a>
     </div>
   </section>
 
-  <!-- Premium Delete Confirmation Modal -->
+  <!-- Delete Confirmation Modal -->
   <div class="modal-overlay" id="deleteModalOverlay">
-    <div class="modal" style="max-width: 450px; border-left: 5px solid #ef4444;">
+    <div class="modal">
         <div class="modal-header">
             <h3 class="modal-title" style="color: #fca5a5;">Confirm Deletion</h3>
-            <button class="modal-close" id="closeDeleteModal">&times;</button>
+            <button class="modal-close" id="closeDeleteModal" aria-label="Close">&times;</button>
         </div>
-        <div class="modal-body" style="text-align: left; padding-top: 0.5rem;">
+        <div class="modal-body">
             <p style="color: var(--text-muted); line-height: 1.6; margin-bottom: 2rem;">
-                Are you sure you want to delete <strong>{{ student.name }}</strong>? This will permanently remove all their contest data and history. This action cannot be undone.
+                Are you sure you want to delete <strong>{{ student.name }}</strong>? This action cannot be undone.
             </p>
-            <div style="display: flex; gap: 1rem;">
+            <div class="form-actions">
                 <form method="post" action="{{ url_for('delete_student', student_id=student.id) }}" style="flex: 1;">
-                    <button type="submit" class="btn btn-danger btn-full" style="height: 44px; font-weight: 700;">Yes, Delete Student</button>
+                    <button type="submit" class="btn btn-danger btn-full">Delete Student</button>
                 </form>
-                <button type="button" class="btn btn-ghost" id="cancelDelete" style="flex: 1; height: 44px; font-weight: 600;">Cancel</button>
+                <button type="button" class="btn btn-ghost" id="cancelDelete" style="flex: 1;">Cancel</button>
             </div>
         </div>
     </div>
@@ -156,9 +149,9 @@
     const showModal = () => overlay.classList.add('is-open');
     const hideModal = () => overlay.classList.remove('is-open');
 
-    openBtn.addEventListener('click', showModal);
-    closeBtn.addEventListener('click', hideModal);
-    cancelBtn.addEventListener('click', hideModal);
-    overlay.addEventListener('click', (e) => { if(e.target === overlay) hideModal(); });
+    if (openBtn) openBtn.addEventListener('click', showModal);
+    if (closeBtn) closeBtn.addEventListener('click', hideModal);
+    if (cancelBtn) cancelBtn.addEventListener('click', hideModal);
+    if (overlay) overlay.addEventListener('click', (e) => { if(e.target === overlay) hideModal(); });
   </script>
 {% endblock %}

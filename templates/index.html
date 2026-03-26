@@ -55,15 +55,15 @@
         {% endfor %}
       </div>
       {% else %}
-        <div class="panel" style="text-align: center; padding: 4rem 2rem;">
+        <div class="empty-state-box">
             <p class="empty-state">No students found. Click the + button to add your first student!</p>
         </div>
       {% endif %}
     </section>
 
     <!-- Floating Action Button -->
-    <button class="fab" id="openModal">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+    <button class="fab" id="openModal" aria-label="Add Student">
+        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
     </button>
 
     <!-- Add Student Modal -->
@@ -71,7 +71,7 @@
         <div class="modal">
             <div class="modal-header">
                 <h3 class="modal-title">Add New Student</h3>
-                <button class="modal-close" id="closeModal">&times;</button>
+                <button class="modal-close" id="closeModal" aria-label="Close">&times;</button>
             </div>
             <div class="modal-body">
                 <form action="/student/add" method="post" class="form-vertical">
@@ -79,7 +79,7 @@
                         Student Name
                         <input type="text" name="name" class="input" placeholder="Enter student name" required>
                     </label>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div class="input-group-row">
                         <label class="form-label">
                             Codeforces Handle
                             <input type="text" name="cf_handle" class="input" placeholder="cf_username">
@@ -93,8 +93,8 @@
                         LeetCode Handle
                         <input type="text" name="lc_handle" class="input" placeholder="lc_username">
                     </label>
-                    <div class="form-actions" style="margin-top: 1.5rem;">
-                        <button type="submit" class="btn btn-primary" style="padding: 0.6rem 2rem;">Add Student</button>
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary btn-full">Add Student</button>
                     </div>
                 </form>
             </div>
@@ -120,6 +120,5 @@
             }
         });
     </script>
-    </section>
 {% endblock %}
 
